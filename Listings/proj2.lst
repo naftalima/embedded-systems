@@ -1,0 +1,114 @@
+C51 COMPILER V9.60.0.0   PROJ2                                                             07/04/2022 17:04:09 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PROJ2
+OBJECT MODULE PLACED IN .\Objects\proj2.obj
+COMPILER INVOKED BY: D:\tools\C51\BIN\C51.EXE proj2.c OPTIMIZE(8,SIZE) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\proj2.
+                    -lst) TABS(2) OBJECT(.\Objects\proj2.obj)
+
+line level    source
+
+   1          #include <REG51F.H>
+   2          
+   3          sbit b0 = P2^0;
+   4          sbit b1 = P2^1;
+   5          
+   6          int count = 0;
+   7          int count1;
+   8          int count2;
+   9          
+  10          void watchingP0(){
+  11   1        static char pEstado = 0x00;
+  12   1        switch (pEstado){
+  13   2          case  0x00: if (b0==0x01){ /* bit 0 de P2 passa de 0 -> 1*/
+  14   3            P1 = (P1 & 0xF0) | (P0 & 0x0F);
+  15   3            pEstado = 0x01;
+  16   3            count2 = count;
+  17   3          }
+  18   2          break;
+  19   2          case  0x01 : if (count - count2 > 10000){/* espera 1s */
+  20   3            P1 = (P1 & 0xF0) | 0x00;
+  21   3            pEstado = 0x02;
+  22   3          }
+  23   2          break;
+  24   2          case  0x02 : if (b0==0x00){/* bit 0 de P2 passa de 1 -> 0*/
+  25   3            pEstado = 0x00;
+  26   3          }
+  27   2          break;
+  28   2        }
+  29   1      }
+  30          
+  31          void watchingP1(){
+  32   1        static char pEstado = 0x00;
+  33   1        switch (pEstado){
+  34   2          case  0x00: if (b1==0x01){ /* bit 0 de P2 passa de 0 -> 1*/
+  35   3            P1 = (P0 & 0xF0) | (P1 & 0x0F);
+  36   3            pEstado = 0x01;
+  37   3            count1 = count;
+  38   3          }
+  39   2          break;
+  40   2          case  0x01 : if (count - count1 > 10000){/* espera 1s */
+  41   3            P1 = 0x00 | (P1 & 0x0F);
+  42   3            pEstado = 0x02;
+  43   3          }
+  44   2          break;
+  45   2          case  0x02 : if (b1==0x00){/* bit 0 de P2 passa de 1 -> 0*/
+  46   3            pEstado = 0x00;
+  47   3          }
+  48   2          break;
+  49   2        }
+  50   1      }
+  51          
+  52          
+  53          void main() 
+  54          {
+C51 COMPILER V9.60.0.0   PROJ2                                                             07/04/2022 17:04:09 PAGE 2   
+
+  55   1        while (1){
+  56   2          watchingP0();
+  57   2          watchingP1();
+  58   2          count ++;
+  59   2        }
+  60   1      }
+  61          
+  62          /*
+  63          Sistema embarcado é um sistema reativo.
+  64          */
+  65          
+  66          /*
+  67          AULA 2
+  68          
+  69          Experimento:
+  70          Usando o 80C51FA da Intel, com 12MHz, implemente a especificação abaixo 
+  71          usando uma função para cada lado com o modelo de Maquinas de Estados. 
+  72          O main() deve ter um loop infinito que chama as duas funções.
+  73          
+  74          Se o bit 1 de P2 mudar de 0 para 1
+  75             Atribua os 4 bits mais significativos de P0 
+  76               aos 4 bits mais significativos de P1
+  77               Após 1 segundo (conte via software)
+  78             Atribua zero aos 4 bits mais significativos
+  79               de P1 e retorne para esperar nova transição
+  80               
+  81          Se o bit 0 de P2 mudar de 0 para 1
+  82             Atribua os 4 bits menos significativos
+  83              de P0 aos 4 bits menos significativos de P1
+  84              Após 1 segundo (conte via software) 
+  85             Atribua zero aos 4 bits menos significativos
+  86              de P1 e retorne para esperar nova transição
+  87          
+  88          */
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    162    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,53 @@
+C51 COMPILER V9.60.0.0   AULA_1                                                            07/25/2022 13:40:11 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE AULA_1
+OBJECT MODULE PLACED IN .\Objects\aula 1.obj
+COMPILER INVOKED BY: D:\tools\C51\BIN\C51.EXE aula 1.c OPTIMIZE(8,SIZE) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\aula 
+                    -1.lst) TABS(2) OBJECT(.\Objects\aula 1.obj)
+
+line level    source
+
+   1          /********
+   2          Alunos:
+   3          Eneri D'Angelis (emd)
+   4          Nathalia Lima (npl)
+   5          
+   6          *********/
+   7          
+   8          #include <REG51F.H>
+   9          
+  10          /* mascara de bit */
+  11          sbit b0 = P2^0;
+  12          sbit b1 = P2^1;
+  13          
+  14          void main()
+  15          {
+  16   1        
+  17   1        while(1){
+  18   2          if (b0){
+  19   3            P1 = (P1 & 0xF0) | (P0 & 0x0F);
+  20   3          } else {
+  21   3            P1 = (P1 & 0xF0);
+  22   3          }   
+  23   2          if (b1){
+  24   3          P1 = (P1 & 0x0F) | (P0 & 0xF0);
+  25   3          } else {
+  26   3          P1 = (P1 & 0x0F);
+  27   3          }
+  28   2        }
+  29   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     42    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

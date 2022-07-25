@@ -1,0 +1,123 @@
+C51 COMPILER V9.60.0.0   AULA2                                                             07/25/2022 13:40:08 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE AULA2
+OBJECT MODULE PLACED IN .\Objects\aula2.obj
+COMPILER INVOKED BY: D:\tools\C51\BIN\C51.EXE aula2.c OPTIMIZE(8,SIZE) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\aula2.
+                    -lst) TABS(2) OBJECT(.\Objects\aula2.obj)
+
+line level    source
+
+   1          /********
+   2          Alunos:
+   3          Eneri D'Angelis (emd)
+   4          Nathalia Lima (npl)
+   5          Rafael Vasconcelos (rjav) 
+   6          
+   7          *********/
+   8          
+   9          
+  10          #include <REG51F.H>
+  11          
+  12          sbit b0 = P2^0;
+  13          sbit b1 = P2^1;
+  14          
+  15          int count = 0;
+  16          int count1;
+  17          int count2;
+  18          
+  19          void watchingP0(){
+  20   1        static char pEstado = 0x00;
+  21   1        switch (pEstado){
+  22   2          case  0x00: if (b0==0x01){ /* bit 0 de P2 passa de 0 -> 1*/
+  23   3            P1 = (P1 & 0xF0) | (P0 & 0x0F);
+  24   3            pEstado = 0x01;
+  25   3            count2 = count;
+  26   3          }
+  27   2          break;
+  28   2          case  0x01 : if (count - count2 > 10000){/* espera 1s */
+  29   3            P1 = (P1 & 0xF0) | 0x00;
+  30   3            pEstado = 0x02;
+  31   3          }
+  32   2          break;
+  33   2          case  0x02 : if (b0==0x00){/* bit 0 de P2 passa de 1 -> 0*/
+  34   3            pEstado = 0x00;
+  35   3          }
+  36   2          break;
+  37   2        }
+  38   1      }
+  39          
+  40          void watchingP1(){
+  41   1        static char pEstado = 0x00;
+  42   1        switch (pEstado){
+  43   2          case  0x00: if (b1==0x01){ /* bit 0 de P2 passa de 0 -> 1*/
+  44   3            P1 = (P0 & 0xF0) | (P1 & 0x0F);
+  45   3            pEstado = 0x01;
+  46   3            count1 = count;
+  47   3          }
+  48   2          break;
+  49   2          case  0x01 : if (count - count1 > 10000){/* espera 1s */
+  50   3            P1 = 0x00 | (P1 & 0x0F);
+  51   3            pEstado = 0x02;
+  52   3          }
+  53   2          break;
+  54   2          case  0x02 : if (b1==0x00){/* bit 0 de P2 passa de 1 -> 0*/
+C51 COMPILER V9.60.0.0   AULA2                                                             07/25/2022 13:40:08 PAGE 2   
+
+  55   3            pEstado = 0x00;
+  56   3          }
+  57   2          break;
+  58   2        }
+  59   1      }
+  60          
+  61          
+  62          void main() 
+  63          {
+  64   1        while (1){
+  65   2          watchingP0();
+  66   2          watchingP1();
+  67   2          count ++;
+  68   2        }
+  69   1      }
+  70          
+  71          /*
+  72          Sistema embarcado é um sistema reativo.
+  73          */
+  74          
+  75          /*
+  76          AULA 2
+  77          
+  78          Experimento:
+  79          Usando o 80C51FA da Intel, com 12MHz, implemente a especificação abaixo 
+  80          usando uma função para cada lado com o modelo de Maquinas de Estados. 
+  81          O main() deve ter um loop infinito que chama as duas funções.
+  82          
+  83          Se o bit 1 de P2 mudar de 0 para 1
+  84             Atribua os 4 bits mais significativos de P0 
+  85               aos 4 bits mais significativos de P1
+  86               Após 1 segundo (conte via software)
+  87             Atribua zero aos 4 bits mais significativos
+  88               de P1 e retorne para esperar nova transição
+  89               
+  90          Se o bit 0 de P2 mudar de 0 para 1
+  91             Atribua os 4 bits menos significativos
+  92              de P0 aos 4 bits menos significativos de P1
+  93              Após 1 segundo (conte via software) 
+  94             Atribua zero aos 4 bits menos significativos
+  95              de P1 e retorne para esperar nova transição
+  96          
+  97          */
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    162    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

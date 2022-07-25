@@ -1,0 +1,90 @@
+C51 COMPILER V9.60.0.0   PROBLEMA_INTERESSANTE                                             07/25/2022 13:37:31 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PROBLEMA_INTERESSANTE
+OBJECT MODULE PLACED IN .\Objects\problema-interessante.obj
+COMPILER INVOKED BY: D:\tools\C51\BIN\C51.EXE problema-interessante.c OPTIMIZE(8,SIZE) BROWSE DEBUG OBJECTEXTEND PRINT(.
+                    -\Listings\problema-interessante.lst) TABS(2) OBJECT(.\Objects\problema-interessante.obj)
+
+line level    source
+
+   1          /********
+   2          Alunos:
+   3          Eneri D'Angelis (emd)
+   4          Nathalia Lima (npl)
+   5          Rafael Vasconcelos (rjav) 
+   6          
+   7          *********/
+   8          #include <reg51.h>
+   9          
+  10          #define FrClk 12000000
+  11          #define FreqTimer0_emHz 100
+  12          #define VALOR_TH0 ((65536 - (FrClk / (12 * FreqTimer0_emHz))) >>8)
+  13          #define VALOR_TL0 ((65536 - (FrClk / (12 * FreqTimer0_emHz))) & 0xFF)
+  14          
+  15          
+  16          
+  17          unsigned int contador;
+  18          
+  19          void timer0_inicializa() 
+  20            {
+  21   1        TR0 = 0;              // Desliga Timer0
+  22   1        TMOD = (TMOD & 0xF0) | 0x01;  // Timer 0 programado como timer de 16 bits
+  23   1        TH0 = VALOR_TH0;  // Programa contagem do Timer0
+  24   1        TL0 = VALOR_TL0;
+  25   1        ET0 = 1;      // Habilita interrupcao do timer 0
+  26   1        TR0 = 1;      // Habilita contagem do timer 0
+  27   1        }
+  28          
+  29          void timer0_int (void) interrupt 1 using 2
+  30            {
+  31   1        TR0 = 0;              // Desliga Timer0
+  32   1        TL0 += VALOR_TL0;
+  33   1        TH0 += VALOR_TH0 + (unsigned char) CY;   // Programa contagem do Timer0
+  34   1        TR0 = 1;      // Habilita contagem do timer 0
+  35   1      
+  36   1        if (contador != 0)
+  37   1           contador --;
+  38   1        }
+  39          
+  40          void main()
+  41            {
+  42   1        timer0_inicializa();
+  43   1        EA=1; //Habilita o tratamento de interrupções
+  44   1      
+  45   1        while (1)
+  46   1            {
+  47   2            contador = 300;
+  48   2            
+  49   2            while(1){
+  50   3            EA = 0;
+  51   3            if(contador == 0)
+  52   3              break;
+  53   3            EA = 1;
+  54   3            } // Fica em loop enquanto "contador != 0"
+C51 COMPILER V9.60.0.0   PROBLEMA_INTERESSANTE                                             07/25/2022 13:37:31 PAGE 2   
+
+  55   2            
+  56   2            if (contador == 0) // Testa se contador é igual a zero.
+  57   2               P0 = 0;
+  58   2      
+  59   2            else
+  60   2              P0 = 0xFF;  // ESTA INSTRUÇÃO NUNCA DEVERIA SER EXECUTADA!
+  61   2            }
+  62   1        }
+  63            
+  64          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    100    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
