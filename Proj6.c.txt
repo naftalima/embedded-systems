@@ -1,0 +1,130 @@
+/******************************
+Alunos:
+	Eneri D'Angelis (emd)
+	Nathalia Lima (npl)
+	Rafael Vasconcelos (rjav) 
+******************************/
+
+#include <REG517A.H>
+
+bit recebeuString = 0;
+bit txOcupado = 0;
+
+char rxBuffer[15];
+char txBuffer[15];
+
+int writerRx = 0;
+int readerRx = 0;
+
+int writerTx = 0;
+int readerTx = 0;
+
+char aux;
+
+char RxBufferVazio(){
+	if(readerRx == writerRx){
+		return 1;
+	}else{
+		return 0;
+	}
+}
+char TxBufferVazio(){
+	if(readerTx == writerTx){
+		return 1;
+	}else{
+		return 0;
+	}
+}
+void zeraString(char *s){
+	int i;
+	for(i=0;s[i] != '$'; i++){
+		s[i] = '_';
+	}
+}
+void escreveRx(){
+	if(S0BUF == '$'){
+		recebeuString = 1;
+	}
+	if((writerRx + 1)%15 != readerRx){
+		rxBuffer[writerRx] = S0BUF;
+		writerRx = (writerRx + 1)%15;
+	}
+	return;
+}
+void sendChar(char c){
+	if(!txOcupado){
+		txBuffer[writerTx] = c;
+		writerTx = (writerTx + 1)%15;
+		TI0 = 1;
+	}
+}	
+void sendString(char *s){
+	while(s[writerTx] != '$'){
+			sendChar(s[writerTx]);
+	};
+	writerTx = 0;
+	readerTx = 0;
+	return;
+	
+}	
+char receiveChar(){
+	return rxBuffer[readerRx];
+}
+void receiveString(char *s){
+	int count = 0;
+	while(!RxBufferVazio()){
+		s[count] = receiveChar();
+		count ++;
+		readerRx = (readerRx + 1)%15;
+	}
+	recebeuString = 0;
+	return;
+}
+void serial_inicializa(){
+	ES0 = 1; 					// Habilita a interrupção da serial
+	REN0 = 1; 					// Habilita a recepção da serial
+	PCON |= 0x80; 		// SMOD = 1
+	ADCON0 |= 0x80;
+	SM0 = 0;					// SCON configuração 
+	SM1 = 1;					// SCON configuração
+}
+void timer1_inicializa(){
+  TR1 = 0;              						// Desliga Timer 1
+  TMOD = (TMOD & 0x0F)|0x20; 				// Timer 1 programado no Modo 2 (8 bits)
+  TH1 = 0x01; 											// Programa valor de contagem do Timer1
+  TR1 = 1;      										// Habilita contagem do Timer 1
+  }
+
+void isr_serial() interrupt 4 using 2{
+	if(TI0){
+		if(!TxBufferVazio()){
+				S0BUF = txBuffer[readerTx];
+				readerTx = (readerTx + 1)%15;
+				txOcupado = 1;
+		}else{
+				txOcupado = 0;
+		}
+	TI0 = 0; // Tem que setar manualmente pra 0
+	// --------------
+	}
+	if(RI0){
+	escreveRx();
+	RI0 = 0; // Tem que setar manualmente pra 0
+	// --------------
+	}
+}
+void main(){
+	char val[15];
+	EAL = 1;
+	serial_inicializa();
+	timer1_inicializa();
+	while(1){
+		if(recebeuString){
+			receiveString(val);
+			sendString(val);
+			zeraString(val);
+		}
+	};
+	
+	return;
+}
